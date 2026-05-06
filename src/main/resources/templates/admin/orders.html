@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Admin ModaStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">ModaStore</a>
+        <div class="d-flex gap-3 align-items-center">
+            <a class="nav-link text-white" href="/admin">Dashboard</a>
+            <a class="nav-link text-white" href="/admin/products">Produtos</a>
+            <a class="nav-link text-white fw-bold" href="/admin/orders">Pedidos</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-outline-light btn-sm" type="submit">Sair</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <h2 class="fw-bold mb-4">Pedidos</h2>
+
+    <div th:if="${orders.empty}" class="text-center py-5 text-muted">
+        <i class="bi bi-bag-x display-1"></i>
+        <p class="mt-2">Nenhum pedido encontrado.</p>
+    </div>
+
+    <div class="card shadow-sm" th:unless="${orders.empty}">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>E-mail</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td class="fw-semibold" th:text="${order.id}"></td>
+                        <td th:text="${order.user.name}"></td>
+                        <td class="text-muted small" th:text="${order.user.email}"></td>
+                        <td class="fw-semibold"
+                            th:text="${'R$ ' + #numbers.formatDecimal(order.total, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' :
+                                                 (${order.status.name() == 'CONFIRMED'} ? 'bg-info' :
+                                                 (${order.status.name() == 'SHIPPED'} ? 'bg-primary' :
+                                                 (${order.status.name() == 'DELIVERED'} ? 'bg-success' : 'bg-danger')))"
+                                  th:text="${order.status}"></span>
+                        </td>
+                        <td class="text-muted small"
+                            th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
