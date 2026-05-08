@@ -65,13 +65,24 @@ public class UserController {
     }
 
     @PostMapping("/checkout")
-    public String processCheckout(@RequestParam String shippingAddress,
+    public String processCheckout(@RequestParam String cep,
+                                  @RequestParam String rua,
+                                  @RequestParam String numero,
+                                  @RequestParam(required = false, defaultValue = "") String complemento,
+                                  @RequestParam String bairro,
+                                  @RequestParam String cidade,
+                                  @RequestParam String estado,
                                   Authentication authentication,
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes) {
         try {
+            String enderecoCompleto = rua + ", " + numero
+                    + (complemento.isBlank() ? "" : ", " + complemento)
+                    + " - " + bairro + ", " + cidade + " - " + estado
+                    + ", CEP: " + cep;
+
             User user = userService.findByEmail(authentication.getName());
-            orderService.createOrder(user, shippingAddress, session);
+            orderService.createOrder(user, enderecoCompleto, session);
             redirectAttributes.addFlashAttribute("success", "Pedido realizado com sucesso!");
             return "redirect:/orders";
         } catch (Exception e) {
